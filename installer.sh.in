@@ -1374,42 +1374,28 @@ menu() {
         DEFITEM="Keyboard"
     fi
 
-    if xbps-uhelper arch | grep -qe '-musl$'; then
-        DIALOG --default-item $DEFITEM \
-            --extra-button --extra-label "Settings" \
-            --title " Void Linux installation menu " \
-            --menu "$MENULABEL" 10 70 0 \
-            "Keyboard" "Set system keyboard" \
-            "Network" "Set up the network" \
-            "Source" "Set source installation" \
-            "Hostname" "Set system hostname" \
-            "Timezone" "Set system time zone" \
-            "RootPassword" "Set system root password" \
-            "UserAccount" "Set primary user name and password" \
-            "BootLoader" "Set disk to install bootloader" \
-            "Partition" "Partition disk(s)" \
-            "Filesystems" "Configure filesystems and mount points" \
-            "Install" "Start installation with saved settings" \
-            "Exit" "Exit installation"
-    else
-        DIALOG --default-item $DEFITEM \
-            --extra-button --extra-label "Settings" \
-            --title " Void Linux installation menu " \
-            --menu "$MENULABEL" 10 70 0 \
-            "Keyboard" "Set system keyboard" \
-            "Network" "Set up the network" \
-            "Source" "Set source installation" \
-            "Hostname" "Set system hostname" \
-            "Locale" "Set system locale" \
-            "Timezone" "Set system time zone" \
-            "RootPassword" "Set system root password" \
-            "UserAccount" "Set primary user name and password" \
-            "BootLoader" "Set disk to install bootloader" \
-            "Partition" "Partition disk(s)" \
-            "Filesystems" "Configure filesystems and mount points" \
-            "Install" "Start installation with saved settings" \
-            "Exit" "Exit installation"
-    fi
+    MENU_OPTS=(
+        "Keyboard" "Set system keyboard"
+        "Network" "Set up the network"
+        "Source" "Set source installation"
+        "Hostname" "Set system hostname"
+    )
+    [ -z "$MUSL_LIBC" ] && MENU_OPTS+=("Locale" "Set system locale")
+    MENU_OPTS+=(
+        "Timezone" "Set system time zone"
+        "RootPassword" "Set system root password"
+        "UserAccount" "Set primary user name and password"
+        "BootLoader" "Set disk to install bootloader"
+        "Partition" "Partition disk(s)"
+        "Filesystems" "Configure filesystems and mount points"
+        "Install" "Start installation with saved settings"
+        "Exit" "Exit installation"
+    )
+
+    DIALOG --default-item $DEFITEM \
+        --extra-button --extra-label "Settings" \
+        --title " Void Linux installation menu " \
+        --menu "$MENULABEL" 10 70 0 "${MENU_OPTS[@]}"
 
     if [ $? -eq 3 ]; then
         # Show settings
