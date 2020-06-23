@@ -847,12 +847,12 @@ configure_wifi() {
     rm -f ${_wpasupconf%.conf}-${dev}.conf
     cp -f ${_wpasupconf} ${_wpasupconf%.conf}-${dev}.conf
     if [ "$enc" = "wep" ]; then
-        echo "network={" >> ${_wpasupconf%.conf}-${dev}.conf
-        echo "  ssid=\"$ssid\"" >> ${_wpasupconf%.conf}-${dev}.conf
-        echo "  wep_key0=\"$pass\"" >> ${_wpasupconf%.conf}-${dev}.conf
-        echo "  wep_tx_keyidx=0" >> ${_wpasupconf%.conf}-${dev}.conf
-        echo "  auth_alg=SHARED" >> ${_wpasupconf%.conf}-${dev}.conf
-        echo "}" >> ${_wpasupconf%.conf}-${dev}.conf
+        echo "network={
+  ssid=\"$ssid\"
+  wep_key0=\"$pass\"
+  wep_tx_keyidx=0
+  auth_alg=SHARED
+}" >> ${_wpasupconf%.conf}-${dev}.conf
     else
         wpa_passphrase "$ssid" "$pass" >> ${_wpasupconf%.conf}-${dev}.conf
     fi
@@ -929,8 +929,8 @@ configure_net_static() {
         DIALOG --msgbox "${BOLD}${RED}ERROR:${RESET} failed to setup your gateway." ${MSGBOXSIZE}
         return 1
     fi
-    echo "nameserver $dns1" >/etc/resolv.conf
-    echo "nameserver $dns2" >>/etc/resolv.conf
+    echo "nameserver $dns1
+nameserver $dns2" > /etc/resolv.conf
     test_network
     if [ $? -eq 1 ]; then
         set_option NETWORK "${dev} static $ip $gw $dns1 $dns2"
@@ -1301,12 +1301,11 @@ ${BOLD}Do you want to continue?${RESET}" 20 80 || return
         elif [ -n "$_dev" -a "$_type" = "static" ]; then
             # static IP through dhcpcd.
             mv $TARGETDIR/etc/dhcpcd.conf $TARGETDIR/etc/dhdpcd.conf.orig
-            echo "# Static IP configuration set by the void-installer for $_dev." \
-                >$TARGETDIR/etc/dhcpcd.conf
-            echo "interface $_dev" >>$TARGETDIR/etc/dhcpcd.conf
-            echo "static ip_address=$_ip" >>$TARGETDIR/etc/dhcpcd.conf
-            echo "static routers=$_gw" >>$TARGETDIR/etc/dhcpcd.conf
-            echo "static domain_name_servers=$_dns1 $_dns2" >>$TARGETDIR/etc/dhcpcd.conf
+            echo "# Static IP configuration set by the void-installer for $_dev.
+interface $_dev
+static ip_address=$_ip
+static routers=$_gw
+static domain_name_servers=$_dns1 $_dns2" > $TARGETDIR/etc/dhcpcd.conf
             enable_dhcpd
         fi
     fi
@@ -1315,8 +1314,8 @@ ${BOLD}Do you want to continue?${RESET}" 20 80 || return
         USERLOGIN="$(get_option USERLOGIN)"
         if [ -z "$(echo $(get_option USERGROUPS) | grep -w wheel)" -a -n "$USERLOGIN" ]; then
             # enable sudo for primary user USERLOGIN who is not member of wheel
-            echo "# Enable sudo for login '$USERLOGIN'" >> $TARGETDIR/etc/sudoers
-            echo "$USERLOGIN ALL=(ALL) ALL" >> $TARGETDIR/etc/sudoers
+            echo "# Enable sudo for login '$USERLOGIN'
+$USERLOGIN ALL=(ALL) ALL" >> $TARGETDIR/etc/sudoers
         else
             # enable the sudoers entry for members of group wheel
             sed -i $TARGETDIR/etc/sudoers \
