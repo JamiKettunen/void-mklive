@@ -1386,7 +1386,7 @@ menu() {
         "Source" "Set source installation"
         "Hostname" "Set system hostname"
     )
-    [ -z "$MUSL_LIBC" ] && MENU_OPTS+=("Locale" "Set system locale")
+    [ $MUSL_LIBC -eq 0 ] && MENU_OPTS+=("Locale" "Set system locale")
     MENU_OPTS+=(
         "Timezone" "Set system time zone"
         "RootPassword" "Set system root password"
