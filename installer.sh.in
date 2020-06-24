@@ -49,8 +49,14 @@ if [ ! -f $CONF_FILE ]; then
 fi
 ANSWER=$(mktemp -t vinstall-XXXXXXXX || exit 1)
 TARGET_FSTAB=$(mktemp -t vinstall-fstab-XXXXXXXX || exit 1)
-MUSL_LIBC=$(xbps-uhelper arch | grep -e '-musl$')
-[ -z "$MUSL_LIBC" ] && DEFITEM_AFTER_HOSTNAME="Locale" || DEFITEM_AFTER_HOSTNAME="Timezone"
+MUSL_LIBC=0
+if xbps-uhelper arch | grep -qe '-musl$'; then
+    MUSL_LIBC=1
+fi
+DEFITEM_AFTER_HOSTNAME="Locale"
+if [ $MUSL_LIBC -eq 1 ]; then
+    DEFITEM_AFTER_HOSTNAME="Timezone"
+fi
 
 trap "DIE" INT TERM QUIT
 
